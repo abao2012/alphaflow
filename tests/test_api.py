@@ -1,3 +1,4 @@
+from pathlib import Path
 from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
@@ -743,6 +744,21 @@ def test_health_check_degrades_gracefully_when_qmt_metadata_is_unavailable(monke
     assert body["data"]["qmt_account_id"] is None
     assert body["data"]["qmt_userdata_path"] is None
     assert body["data"]["discovery_error"] == "account lookup failed"
+
+
+def test_health_check_redacts_qmt_metadata(monkeypatch):
+    monkeypatch.setattr(routes.qmt_connector, "check_market_connection", lambda: True)
+    monkeypatch.setattr(routes.qmt_connector, "check_account_connection", lambda: True)
+    monkeypatch.setattr(routes.qmt_connector, "get_account_id", lambda: "1234567890")
+    monkeypatch.setattr(routes.qmt_connector, "get_userdata_path", lambda: Path(r"D:\BrokerQMT\userdata_mini"))
+    monkeypatch.setattr(routes.settings, "qmt_account_id", None)
+
+    response = client.get("/api/v1/system/health")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data"]["qmt_account_id"] == "12******90"
+    assert body["data"]["qmt_userdata_path"] == "[configured]"
 
 
 def test_mainline_summary_returns_lightweight_cached_payload(monkeypatch):

@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime, timedelta
 from threading import Lock
 
@@ -91,6 +92,21 @@ def _diagnose_cache_enabled() -> bool:
 
 def ok(data):
     return ApiEnvelope(data=data)
+
+
+def _mask_identifier(value: str | None) -> str | None:
+    if not value:
+        return None
+    if len(value) <= 4:
+        return "*" * len(value)
+    return f"{value[:2]}{'*' * (len(value) - 4)}{value[-2:]}"
+
+
+def _redact_local_paths(value: str | None) -> str:
+    if not value:
+        return ""
+    value = re.sub(r"[A-Za-z]:\\[^\r\n\"']+", "[local-path]", value)
+    return re.sub(r"C:\\Users\\[^\\\s]+", r"C:\\Users\\[user]", value, flags=re.IGNORECASE)
 
 
 def _build_polling_policy_hint(emerging_items: list[dict]) -> PollingPolicyHintResponse:
@@ -422,9 +438,10 @@ def health_check() -> ApiEnvelope[dict]:
     discovery_error = ""
     try:
         account_id = settings.qmt_account_id or qmt_connector.get_account_id()
-        userdata_path = str(qmt_connector.get_userdata_path())
+        if qmt_connector.get_userdata_path():
+            userdata_path = "[configured]"
     except Exception as exc:
-        discovery_error = str(exc)
+        discovery_error = _redact_local_paths(str(exc))
 
     return ok(
         {
@@ -432,7 +449,7 @@ def health_check() -> ApiEnvelope[dict]:
             "account_connected": qmt_connector.check_account_connection(),
             "advisory_only_mode": settings.advisory_only_mode,
             "live_order_submission_enabled": settings.enable_order_submission and not settings.advisory_only_mode,
-            "qmt_account_id": account_id,
+            "qmt_account_id": _mask_identifier(account_id),
             "qmt_userdata_path": userdata_path,
             "discovery_error": discovery_error,
         }
