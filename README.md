@@ -6,6 +6,8 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+![AlphaFlow A 股主线趋势识别引擎](docs/assets/alphaflow-overview.png)
+
 ---
 
 ## 什么是主线？
