@@ -1,0 +1,58 @@
+# ── Python ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual Environment ────────────────────────────────────
+.venv/
+venv/
+ENV/
+
+# ── Environment Variables (contains secrets) ──────────────
+.env
+
+# ── IDE ────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Runtime Data (generated at runtime) ───────────────────
+runtime/data/
+runtime/logs/
+runtime/config/hermes_polling_policy.json
+
+# ── Logs ───────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Debug / Temp Files ────────────────────────────────────
+debug_*.txt
+tmp_*.py
+server_debug.log
+
+# ── pytest ─────────────────────────────────────────────────
+.pytest_cache/
+pytest-cache-files-*/
+
+# ── Hermes (agent tooling, not project code) ──────────────
+.hermes/
+
+# ── Lock Files ─────────────────────────────────────────────
+uv.lock
+poetry.lock
+
+# ── Shortcuts / Windows ───────────────────────────────────
+*.lnk
+*.bat
