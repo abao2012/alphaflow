@@ -105,6 +105,15 @@ AlphaFlow/
 │       ├── risk_engine.py               # 风险评估
 │       ├── review_engine.py             # 每日复盘
 │       └── ...
+├── hermes/                              # Hermes Agent 集成
+│   ├── README.md                        # 集成指南
+│   ├── setup.sh                         # 一键安装脚本
+│   ├── config/alphaflow_config.json     # 配置模板
+│   └── skills/alphaflow-monitor/        # Hermes 技能
+│       ├── SKILL.md                     # 技能定义
+│       ├── scripts/poll_alphaflow.py    # 轮询/推送脚本
+│       ├── scripts/fetch_catalyst.py    # 催化信息搜索
+│       └── templates/push_message.md    # 推送消息模板
 ├── runtime/
 │   └── config/mainlines.json     # 主线配置（可自定义）
 ├── scripts/                      # 辅助脚本
@@ -237,6 +246,46 @@ uvicorn app.main:app --host 127.0.0.1 --port 8710
 pip install -e ".[dev]"
 pytest tests/ -v
 ```
+
+## Hermes 集成（微信/QQ 推送）
+
+AlphaFlow 设计为 Hermes Agent 的本地策略服务。集成后，Hermes 可自动轮询市场状态、检测主线变化，并推送告警到微信/QQ。
+
+### 快速集成
+
+```bash
+# 1. 确保 AlphaFlow 已启动
+curl http://127.0.0.1:8710/api/v1/system/health
+
+# 2. 安装 Hermes 技能
+bash hermes/setup.sh
+
+# 3. 创建定时轮询（在 Hermes CLI 中）
+hermes cronjob create \
+  --schedule '*/5 9-15 * * 1-5' \
+  --prompt '使用 alphaflow-monitor 技能轮询 AlphaFlow 检查市场主线变化' \
+  --skills alphaflow-monitor
+```
+
+### 推送逻辑
+
+| 信号类型 | 行为 | 示例 |
+|---------|------|------|
+| `probe` | 立即推送 | 早期升温机会，建议小仓试探 |
+| `watch` | 汇总推送 | 观察中，暂不操作 |
+| `avoid_chase` | 风险提醒 | 已过热，不要追高 |
+
+### 对话示例
+
+集成后可在微信/QQ 中直接问 Hermes：
+
+- "当前市场主线是什么？"
+- "AI 算力有什么催化？"
+- "哪些方向刚开始升温？"
+
+详见 [hermes/README.md](hermes/README.md)。
+
+---
 
 ## API 接口
 

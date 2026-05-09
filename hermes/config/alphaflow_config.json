@@ -1,0 +1,10 @@
+{
+  "api_base": "http://127.0.0.1:8710",
+  "snapshot_dir": "~/.hermes/alphaflow_snapshots",
+  "push_on_alert": true,
+  "push_on_phase_change": true,
+  "push_on_score_delta": 3.0,
+  "polling_interval_minutes": 5,
+  "quiet_hours_start": 22,
+  "quiet_hours_end": 9
+}
